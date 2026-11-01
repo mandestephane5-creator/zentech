@@ -284,7 +284,7 @@
     "categorie": "Chaises Gaming",
     "prix": 225000,
     "ancienPrix": null,
-    "qte": null,
+    "qte": 3,
     "visible": true,
     "badge": "",
     "img": "img/produits/fauteuil-gaming-inclinable.webp",
