@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /admin.html
+Disallow: /zentech/admin.html
 
-Sitemap: https://www.zentech.bf/sitemap.xml
+Sitemap: https://mandestephane5-creator.github.io/zentech/sitemap.xml
