@@ -1,7 +1,7 @@
 // ===== CONFIGURATION =====
 const WA  = '22665074260';
 const OM  = '65074260'; // Numéro Orange Money
-const API = 'http://localhost:3000/api'; // ancien serveur (plus utilisé en ligne)
+const API = ''; // ancien serveur local : désactivé sur le site en ligne
 // Les articles et les prix viennent de data/produits.json, modifié depuis admin.html
 const DATA_URL = 'data/produits.json';
 
@@ -10,14 +10,24 @@ const produitsLocaux = [{"id": 1, "nom": "HP EliteBook 840 G8", "categorie": "Or
 
 // ===== STATE =====
 let produits    = produitsLocaux.slice();
-let panier      = JSON.parse(localStorage.getItem('zt-panier') || '[]');
-let wl          = JSON.parse(localStorage.getItem('zt-wl')     || '[]');
+// panier et favoris relus avec prudence : une donnée abîmée ou piégée est ignorée
+function lireListe(cle) {
+  try { var v = JSON.parse(localStorage.getItem(cle) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+}
+function panierPropre(liste) {
+  return liste.filter(function(x) { return x && Number.isFinite(Number(x.id)); }).map(function(x) {
+    return { id: Number(x.id), nom: String(x.nom || ''), prix: Math.max(0, Number(x.prix) || 0), img: String(x.img || ''),
+             categorie: String(x.categorie || ''), qte: Math.min(99, Math.max(1, Math.round(Number(x.qte) || 1))) };
+  });
+}
+let panier      = panierPropre(lireListe('zt-panier'));
+let wl          = lireListe('zt-wl').map(Number).filter(Number.isFinite);
 let currentId   = null;
 let modeServeur = false;
 
 // ===== STORAGE =====
-function savePanier() { localStorage.setItem('zt-panier', JSON.stringify(panier)); }
-function saveWL()     { localStorage.setItem('zt-wl',     JSON.stringify(wl));     }
+function savePanier() { try { localStorage.setItem('zt-panier', JSON.stringify(panier)); } catch (e) {} }
+function saveWL()     { try { localStorage.setItem('zt-wl',     JSON.stringify(wl));     } catch (e) {} }
 
 // ===== LOADER =====
 function fermerLoader() {
@@ -29,8 +39,9 @@ function fermerLoader() {
 
 // ===== THEME INITIAL =====
 (function() {
-  var st = localStorage.getItem('zt-theme');
-  if (st) document.documentElement.setAttribute('data-theme', st);
+  var st = null;
+  try { st = localStorage.getItem('zt-theme'); } catch (e) {}
+  if (st === 'light' || st === 'dark') document.documentElement.setAttribute('data-theme', st);
 })();
 
 // ===== OUTILS =====
@@ -101,9 +112,9 @@ function chargerProduits() {
 function addToCart(p) {
   if (!p) return;
   if (enRupture(p)) { showToast('Cet article est en rupture de stock'); return; }
-  if (surDemande(p)) { window.open(lienDemande(p), '_blank'); return; }
+  if (surDemande(p)) { window.open(lienDemande(p), '_blank', 'noopener'); return; }
   var ex = panier.find(function(x) { return x.id === p.id; });
-  if (ex) { ex.qte++; }
+  if (ex) { ex.qte = Math.min(99, ex.qte + 1); }
   else { panier.push({ id: p.id, nom: p.nom, prix: p.prix, img: p.img, categorie: p.categorie || '', qte: 1 }); }
   savePanier();
   updateCart();
@@ -114,7 +125,7 @@ function addToCart(p) {
 function changeQte(id, d) {
   var item = panier.find(function(x) { return x.id === id; });
   if (!item) return;
-  item.qte += d;
+  item.qte = Math.min(99, item.qte + d);
   if (item.qte <= 0) panier = panier.filter(function(x) { return x.id !== id; });
   savePanier(); updateCart(); renderCart();
 }
@@ -168,7 +179,7 @@ function renderCart() {
         '<p class="cp">' + (item.prix * item.qte).toLocaleString('fr-FR') + ' FCFA</p>' +
         '<div class="c-item-ctrl">' +
           '<button onclick="changeQte(' + item.id + ',-1)"><i class="fas fa-minus"></i></button>' +
-          '<span>' + item.qte + '</span>' +
+          '<span>' + Number(item.qte) + '</span>' +
           '<button onclick="changeQte(' + item.id + ',1)"><i class="fas fa-plus"></i></button>' +
         '</div>' +
       '</div>' +
@@ -396,7 +407,7 @@ function payerOrangeMoney(montant, nomClient) {
         '</a>' +
 
         // Bouton WhatsApp secours
-        '<a class="om-btn-wa" href="https://wa.me/' + WA + '?text=' + encodeURIComponent('Bonjour, je souhaite payer ma commande ZenTech de ' + montant.toLocaleString('fr-FR') + ' FCFA via Orange Money.') + '" target="_blank">' +
+        '<a class="om-btn-wa" href="https://wa.me/' + WA + '?text=' + encodeURIComponent('Bonjour, je souhaite payer ma commande ZenTech de ' + montant.toLocaleString('fr-FR') + ' FCFA via Orange Money.') + '" target="_blank" rel="noopener">' +
           '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12.004 2C6.479 2 2.005 6.474 2.005 12c0 1.767.465 3.535 1.35 5.086L2 22l5.04-1.322A10.004 10.004 0 0012.004 22C17.529 22 22 17.526 22 12c0-5.525-4.471-10-9.996-10zm0 18.36a8.356 8.356 0 01-4.252-1.163l-.305-.181-3.159.829.845-3.074-.2-.316A8.336 8.336 0 013.649 12c0-4.61 3.745-8.356 8.355-8.356 4.61 0 8.356 3.746 8.356 8.356 0 4.61-3.746 8.36-8.356 8.36z"/></svg>' +
           'Besoin d\'aide ? WhatsApp' +
         '</a>' +
@@ -459,7 +470,7 @@ function cmdWA() {
     }).catch(function() {});
   }
 
-  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
+  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
 }
 
 // ===== RECHERCHE =====
@@ -605,7 +616,7 @@ function openModal(id) {
     btn.disabled = false;
     btn.classList.remove('done');
     btn.innerHTML = '<i class="fab fa-whatsapp"></i> Demander le prix';
-    btn.onclick = function() { window.open(lienDemande(p), '_blank'); };
+    btn.onclick = function() { window.open(lienDemande(p), '_blank', 'noopener'); };
   } else if (btn && enRupture(p)) {
     btn.innerHTML = '<i class="fas fa-ban"></i> Indisponible';
     btn.disabled = true;
@@ -657,7 +668,7 @@ function envoyerContact() {
   var m = (document.getElementById('cMsg')    || {}).value || '';
   if (!p || !t || !m) { showToast('Remplissez au moins votre prénom, téléphone et message'); return; }
   var msg = '*Message depuis ZenTech*\n\n*Prénom:* ' + p + '\n*Téléphone:* ' + t + (s ? '\n*Sujet:* ' + s : '') + '\n*Message:* ' + m;
-  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank');
+  window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
 }
 
 // ===== THEME =====
@@ -669,7 +680,7 @@ function toggleTheme() {
   var lbl = document.getElementById('themeLbl');
   if (ico) ico.className   = d ? 'fas fa-sun'  : 'fas fa-moon';
   if (lbl) lbl.textContent = d ? 'Sombre' : 'Clair';
-  localStorage.setItem('zt-theme', d ? 'light' : 'dark');
+  try { localStorage.setItem('zt-theme', d ? 'light' : 'dark'); } catch (e) {}
 }
 
 function toggleMobile() {

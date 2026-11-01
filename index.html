@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://www.google.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Ordinateurs, écouteurs, montres connectées à Ouaga | ZenTech</title>
   <meta name="description" content="Boutique high-tech à Ouagadougou : ordinateurs HP, Lenovo et Dell, écouteurs sans fil, montres connectées, chaises gaming. Livraison 24h, Orange Money.">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -18,13 +20,13 @@
   <!-- Adresse du site, données de la boutique et outils Google : bloc mis à jour automatiquement
        par la page admin à chaque publication (ne pas modifier à la main) -->
   <!-- zt:seo -->
-  <link rel="canonical" href="https://www.zentech.bf/">
-  <meta property="og:url" content="https://www.zentech.bf/">
-  <meta property="og:image" content="https://www.zentech.bf/img/partage.jpg">
+  <link rel="canonical" href="https://mandestephane5-creator.github.io/zentech/">
+  <meta property="og:url" content="https://mandestephane5-creator.github.io/zentech/">
+  <meta property="og:image" content="https://mandestephane5-creator.github.io/zentech/img/partage.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="ZenTech, boutique high-tech à Ouagadougou">
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ElectronicsStore","@id":"https://www.zentech.bf/#boutique","name":"ZenTech","url":"https://www.zentech.bf/","logo":"https://www.zentech.bf/img/logo-zentech-icone.png","image":"https://www.zentech.bf/img/partage.jpg","description":"Boutique high-tech à Ouagadougou : ordinateurs portables, écouteurs sans fil, montres connectées, chaises gaming, chargeurs et power banks.","telephone":"+22672256937","email":"contact@zentech.bf","address":{"@type":"PostalAddress","streetAddress":"Secteur 15, près du marché","addressLocality":"Ouagadougou","addressCountry":"BF"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"08:00","closes":"19:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"10:00","closes":"16:00"}],"paymentAccepted":"Orange Money, Moov Money, paiement à la livraison","currenciesAccepted":"XOF","areaServed":{"@type":"Country","name":"Burkina Faso"}},{"@type":"WebSite","@id":"https://www.zentech.bf/#site","url":"https://www.zentech.bf/","name":"ZenTech","inLanguage":"fr","publisher":{"@id":"https://www.zentech.bf/#boutique"}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"ElectronicsStore","@id":"https://mandestephane5-creator.github.io/zentech/#boutique","name":"ZenTech","url":"https://mandestephane5-creator.github.io/zentech/","logo":"https://mandestephane5-creator.github.io/zentech/img/logo-zentech-icone.png","image":"https://mandestephane5-creator.github.io/zentech/img/partage.jpg","description":"Boutique high-tech à Ouagadougou : ordinateurs portables, écouteurs sans fil, montres connectées, chaises gaming, chargeurs et power banks.","telephone":"+22672256937","email":"contact@zentech.bf","address":{"@type":"PostalAddress","streetAddress":"Secteur 15, près du marché","addressLocality":"Ouagadougou","addressCountry":"BF"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"08:00","closes":"19:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"10:00","closes":"16:00"}],"paymentAccepted":"Orange Money, Moov Money, paiement à la livraison","currenciesAccepted":"XOF","areaServed":{"@type":"Country","name":"Burkina Faso"}},{"@type":"WebSite","@id":"https://mandestephane5-creator.github.io/zentech/#site","url":"https://mandestephane5-creator.github.io/zentech/","name":"ZenTech","inLanguage":"fr","publisher":{"@id":"https://mandestephane5-creator.github.io/zentech/#boutique"}}]}</script>
   <!-- /zt:seo -->
 
   <link rel="icon" type="image/png" sizes="48x48" href="img/icons/favicon-48.png">
@@ -42,8 +44,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="preload" as="image" href="img/produits/hp-elitebook-840-g8.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
   <!-- Questions fréquentes, lues par Google (mêmes textes que la section FAQ de la page) -->
   <script type="application/ld+json">

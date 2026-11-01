@@ -293,3 +293,20 @@ body { font-family: "Inter", "Segoe UI", system-ui, sans-serif; }
 }
 @keyframes zt-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @media (max-width: 760px) { .editor { border-radius: 0; } }
+
+/* ---------- verrouillage de l'admin ---------- */
+.lock-set { margin-top: 4px; padding-top: 4px; }
+.lock-note { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: .8rem; line-height: 1.5; color: var(--text3); }
+.lock-note i { color: var(--red); margin-top: 3px; }
+.login.lock { position: fixed; inset: 0; z-index: 80; overflow-y: auto; }
+.lock .login-card { text-align: left; animation: zt-in .35s cubic-bezier(.2, .7, .2, 1) both; }
+.lock-ico { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; display: grid; place-items: center; background: var(--red-bg); color: var(--red); font-size: 1.25rem; }
+.lock-title { text-align: center; font-size: 1.35rem; }
+.lock-forgot { display: flex; justify-content: center; width: 100%; margin-top: 16px; font-weight: 500; color: var(--text3); }
+.lock-forgot:hover { color: var(--red); }
+
+/* ---------- clé GitHub : toujours masquée ---------- */
+.secret { -webkit-text-security: disc; text-security: disc; font-family: monospace; letter-spacing: .08em; }
+.secret::placeholder { font-family: "Inter", sans-serif; letter-spacing: 0; }
+.secret-note { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text3); }
+.secret-note i { color: var(--red); font-size: .75rem; }

@@ -1,7 +1,7 @@
 // ===== SERVICE WORKER ZENTECH =====
 // v5 : pages produits (référencement), animations, statistiques Google non mises en cache. Chemins relatifs (GitHub Pages).
-const CACHE_NAME  = 'zentech-v8';
-const CACHE_DATA  = 'zentech-data-v8';
+const CACHE_NAME  = 'zentech-v9';
+const CACHE_DATA  = 'zentech-data-v9';
 const OFFLINE_URL = 'offline.html';
 
 // Fichiers mis en cache dès l'installation (chemins relatifs au dossier du site)

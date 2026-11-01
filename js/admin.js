@@ -6,6 +6,8 @@
    ============================================================ */
 (function () {
   "use strict";
+  // Jamais dans le cadre d'un autre site (protection contre le « clickjacking »)
+  if (window.top !== window.self) return;
 
   /* ---------- Réglages (facultatifs) ----------
      Sur GitHub Pages, le compte et le dépôt sont détectés tout seuls.
@@ -80,8 +82,7 @@
   function normSite(o) {
     o = o || {};
     let a = String(o.adresse || "").trim();
-    if (a && !/^https?:\/\//i.test(a)) a = "https://" + a;
-    if (a && !a.endsWith("/")) a += "/";
+    if (a) a = SEO ? (SEO.base(a) === SEO.SITE_PAR_DEFAUT && !/zentech\.bf/i.test(a) ? "" : SEO.base(a)) : "";
     return { adresse: a, ga: SEO ? SEO.idGA(o.ga) : "", gsc: SEO ? SEO.codeGSC(o.gsc) : "" };
   }
   const adresseSite = () => S.site.adresse || adresseDetectee() || (SEO ? SEO.SITE_PAR_DEFAUT : "");
@@ -191,22 +192,135 @@
     if (!S.owner || !S.repo) { $("#repoFields").hidden = false; $("#repoLine").hidden = true; }
   }
 
+  /* ---------- verrouillage ----------
+     La clé GitHub n'est jamais enregistrée en clair : elle est chiffrée
+     (AES-GCM) avec une clé tirée du code de verrouillage (PBKDF2).
+     Sans le code, ce qui reste sur l'appareil est illisible. */
+  const COFFRE = "zt-admin-coffre", ESSAIS = "zt-admin-essais";
+  const MAX_ESSAIS = 5, VEILLE_MIN = 10, TOURS = 600000;
+  const masqueCss = !!(window.CSS && CSS.supports && CSS.supports("-webkit-text-security", "disc"));
+  function remasquer() {
+    $$("[data-eye]").forEach((b) => {
+      const i = document.getElementById(b.dataset.eye);
+      if (masqueCss) i.classList.add("secret"); else i.type = "password";
+      b.querySelector("i").className = "fas fa-eye";
+    });
+  }
+  let coffreMemo = null, verrouille = false, modeVerrou = "ouvrir", derniereActivite = Date.now();
+  const b64 = (u8) => { let s = ""; u8.forEach((c) => (s += String.fromCharCode(c))); return btoa(s); };
+  const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+  async function cleDuCode(code, sel, tours) {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt: sel, iterations: tours, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function sceller(token, code, local) {
+    const sel = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const k = await cleDuCode(code, sel, TOURS);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, k, new TextEncoder().encode(token)));
+    coffreMemo = { v: 1, it: TOURS, sel: b64(sel), iv: b64(iv), ct: b64(ct) };
+    oublierCle(true);
+    if (!keep.set(COFFRE, JSON.stringify(coffreMemo), !local))
+      toast("Cet appareil ne peut pas garder la clé : il faudra la recoller à la prochaine ouverture.", 5000);
+  }
+  function coffre() {
+    try { return JSON.parse(keep.get(COFFRE, true) || keep.get(COFFRE) || "null") || coffreMemo; } catch (e) { return coffreMemo; }
+  }
+  async function ouvrirCoffre(code) {
+    const c = coffre();
+    if (!c) return null;
+    try {
+      const k = await cleDuCode(code, unb64(c.sel), c.it || TOURS);
+      return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(c.iv) }, k, unb64(c.ct)));
+    } catch (e) { return null; }
+  }
+  function oublierCle(garderMemo) {
+    keep.del(COFFRE); keep.del(ESSAIS); keep.del("zt-admin-cle");
+    if (!garderMemo) coffreMemo = null;
+  }
+  function codeFaible(c) {
+    if (c.length < 6) return "Le code doit faire au moins 6 caractères.";
+    if (/^(.)\1+$/.test(c)) return "Ce code est trop simple : évitez de répéter le même caractère.";
+    if ("01234567890 09876543210 abcdefghijklmnopqrstuvwxyz azertyuiop qwertyuiop".includes(c.toLowerCase()))
+      return "Ce code est trop simple : évitez les suites comme 123456 ou abcdef.";
+    if (/^(password|motdepasse|zentech|admin)/i.test(c)) return "Ce code est trop facile à deviner.";
+    return "";
+  }
+  function inerte(on) {
+    ["#app", "#editor", "#newsPanel", "#seoPanel", "#veil", "#dialog"].forEach((s) => { const el = $(s); if (el) el.inert = on; });
+  }
+  function montrerVerrou(mode, msg) {
+    modeVerrou = mode;
+    const choisir = mode === "choisir";
+    $("#lockTitle").textContent = choisir ? "Protégez l'admin" : "Admin verrouillé";
+    $("#lockSub").textContent = msg || (choisir
+      ? `Choisissez un code de verrouillage. Il vous sera demandé sur cet appareil à chaque ouverture et après ${VEILLE_MIN} minutes sans activité.`
+      : "Entrez votre code de verrouillage pour continuer.");
+    $("#lockCode2").hidden = !choisir;
+    $("#inUnlock").placeholder = choisir ? "6 caractères minimum" : "";
+    $("#unlockBtn").innerHTML = choisir ? '<i class="fas fa-shield-halved"></i> Enregistrer le code' : '<i class="fas fa-unlock"></i> Déverrouiller';
+    $("#lockForgot").textContent = choisir ? "Utiliser une autre clé GitHub" : "Code oublié ? Se reconnecter avec la clé GitHub";
+    $("#inUnlock").value = $("#inUnlock2").value = "";
+    remasquer();
+    $("#lockErr").hidden = true;
+    $("#login").hidden = true;
+    $("#lock").hidden = false;
+    inerte(true);
+    setTimeout(() => $("#inUnlock").focus(), 60);
+  }
+  function deverrouiller() {
+    verrouille = false;
+    $("#lock").hidden = true;
+    inerte(false);
+    derniereActivite = Date.now();
+  }
+  function verrouiller(auto) {
+    if (!S.token || verrouille) return;
+    if (!coffre()) return retourConnexion("Session terminée. Reconnectez-vous avec votre clé GitHub.");
+    verrouille = true;
+    S.token = "";
+    montrerVerrou("ouvrir", auto ? `Verrouillé après ${VEILLE_MIN} minutes sans activité. Entrez votre code pour continuer.` : "");
+  }
+  function retourConnexion(msg) {
+    verrouille = false;
+    S.token = "";
+    S.ancien = null;
+    $("#lock").hidden = true;
+    $("#app").hidden = true;
+    inerte(false);
+    $("#login").hidden = false;
+    const e = $("#loginErr");
+    e.textContent = msg || "";
+    e.hidden = !msg;
+    setTimeout(() => $("#inToken").focus(), 60);
+  }
+  function verifierVeille() {
+    if (S.token && !verrouille && !publishing && Date.now() - derniereActivite > VEILLE_MIN * 60000) verrouiller(true);
+  }
+
   /* ---------- connexion ---------- */
-  async function connecter(token, remember) {
+  async function connecter(token, scelle) {
     S.token = token.trim();
     const repo = await gh(R());
     S.branch = CONFIG.branch || repo.default_branch || "main";
     if (repo.permissions && repo.permissions.push === false)
       throw Object.assign(new Error(""), { status: 403 });
     await chargerArticles();
-    keep.del("zt-admin-cle");
-    keep.set("zt-admin-cle", S.token, !remember);
+    if (scelle) await sceller(S.token, scelle.code, scelle.local);
     keep.set("zt-admin-depot", JSON.stringify({ owner: S.owner, repo: S.repo }));
+    ["#inToken", "#inCode", "#inCode2", "#inUnlock", "#inUnlock2"].forEach((s) => ($(s).value = ""));
+    remasquer();
     $("#login").hidden = true;
+    $("#lock").hidden = true;
+    inerte(false);
+    verrouille = false;
+    S.ancien = null;
+    derniereActivite = Date.now();
     $("#app").hidden = false;
     $("#repoInfo").textContent = `Dépôt ${S.owner}/${S.repo} · branche ${S.branch}`;
     await reprendreBrouillon();
     rendre();
+    S.pret = true;
   }
 
   async function chargerArticles() {
@@ -346,7 +460,7 @@
       (enPromo(p) || p.badge === "promo" ? '<span class="tagx promo">Promo</span>' : "");
     const q = p.qte === null ? '<span class="none">—</span>' : `<span class="${p.qte === 0 ? "zero" : ""}">${p.qte}</span>`;
     return `<div class="item${modifie ? " changed" : ""}${p.visible ? "" : " hidden-item"}" data-id="${p.id}">
-      <div class="thumb">${p.img ? `<img src="${esc(imgSrc(p.img))}" alt="" loading="lazy" onerror="this.outerHTML='<i class=\\'fas fa-image\\'></i>'">` : '<i class="fas fa-image"></i>'}</div>
+      <div class="thumb">${p.img ? `<img src="${esc(imgSrc(p.img))}" alt="" loading="lazy">` : '<i class="fas fa-image"></i>'}</div>
       <div class="it-name"><b>${esc(p.nom)}</b><small>${esc(p.categorie)}</small>${tags}</div>
       <div class="it-price">${p.prix > 0 ? `<b>${fcfa(p.prix)}</b>` : '<b class="dem">Prix sur demande</b>'}${enPromo(p) ? `<s>${fcfa(p.ancienPrix)}</s>` : ""}</div>
       <div class="it-stock"><div class="mini-qty"><button type="button" data-q="-1" aria-label="Retirer 1 du stock"><i class="fas fa-minus"></i></button>${q}<button type="button" data-q="1" aria-label="Ajouter 1 au stock"><i class="fas fa-plus"></i></button></div></div>
@@ -540,7 +654,7 @@
       // 4. pages pour Google : une page par article, catalogue, plan du site, robots.txt, page 404
       //    (les nouveaux articles reçoivent ici l'adresse de leur page, enregistrée dans le fichier des articles)
       const noms = [...idsModifies()].map((id) => (S.produits.find((p) => p.id === id) || {}).nom).filter(Boolean);
-      const n = nbChangements(), refChange = siteChange();
+      const n = nbChangements(), refChange = siteChange(), nwChange = newsChange();
       const site = normSite(S.site);
       const adresse = adresseSite();
       if (SEO) {
@@ -567,8 +681,7 @@
       tree.push({ path: CONFIG.dataPath, mode: "100644", type: "blob", content: json });
       const newTree = await gh(`${R()}/git/trees`, { method: "POST", body: { base_tree: commit.tree.sha, tree } });
       // 6. un seul envoi pour tout
-      const nwChange = newsChange();
-      const nArt = n - (refChange ? 1 : 0) - (nwChange ? 1 : 0);
+      const nArt = Math.max(0, n - (refChange ? 1 : 0) - (nwChange ? 1 : 0));
       const message = (nArt
         ? `Admin : ${nArt} modification${nArt > 1 ? "s" : ""} des articles` + (noms.length ? ` (${noms.slice(0, 3).join(", ")}${noms.length > 3 ? ", …" : ""})` : "")
         : nwChange ? "Admin : actualités" : "Admin : référencement Google") + (nArt && refChange ? " + référencement" : "") + ((nArt || refChange) && nwChange ? " + actualités" : "");
@@ -629,7 +742,7 @@
   function newsListe() {
     const l = S.news.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
     $("#newsItems").innerHTML = l.length ? l.map((a) => `<div class="news-it" data-id="${a.id}"><span class="th">${a.image ? `<img src="${esc(imgSrc(a.image))}" alt="">` : '<i class="fas fa-newspaper"></i>'}</span>
-      <span><b>${esc(a.titre)}</b><small>${SEO ? SEO.dateFr(a.date) : a.date}${a.visible === false ? ' · <span class="off">brouillon</span>' : ""}</small></span><i class="fas fa-pen" style="color:var(--text3)"></i></div>`).join("")
+      <span><b>${esc(a.titre)}</b><small>${esc(SEO ? SEO.dateFr(a.date) : a.date)}${a.visible === false ? ' · <span class="off">brouillon</span>' : ""}</small></span><i class="fas fa-pen" style="color:var(--text3)"></i></div>`).join("")
       : '<p class="muted" style="margin-top:12px">Aucune actualité. Cliquez sur « Nouvelle actualité ».</p>';
   }
   function newsMode(form) {
@@ -720,34 +833,93 @@
   function brancher() {
     // connexion
     $("#repoEdit").onclick = () => { $("#repoFields").hidden = false; $("#repoLine").hidden = true; $("#inOwner").focus(); };
-    $("#eye").onclick = () => {
-      const i = $("#inToken"), show = i.type === "password";
-      i.type = show ? "text" : "password";
-      $("#eye i").className = show ? "fas fa-eye-slash" : "fas fa-eye";
-    };
+    // champs secrets : masqués sans être des « mots de passe », pour que le navigateur
+    // ne propose jamais de les enregistrer. La clé GitHub ne peut ni être affichée ni copiée.
+    $$("input.secret").forEach((i) => {
+      if (!masqueCss) i.type = "password";
+      i.name = "z" + Math.random().toString(36).slice(2);   // pas d'historique de saisie
+      ["copy", "cut", "dragstart"].forEach((ev) => i.addEventListener(ev, (e) => e.preventDefault()));
+    });
+    $$("[data-eye]").forEach((b) => (b.onclick = () => {
+      const i = document.getElementById(b.dataset.eye);
+      const show = masqueCss ? i.classList.contains("secret") : i.type === "password";
+      if (masqueCss) i.classList.toggle("secret", !show); else i.type = show ? "text" : "password";
+      b.querySelector("i").className = show ? "fas fa-eye-slash" : "fas fa-eye";
+    }));
     $("#loginForm").onsubmit = async (e) => {
       e.preventDefault();
       const errBox = $("#loginErr"), btn = $("#loginBtn");
+      const stop = (m, champ) => { errBox.textContent = m; errBox.hidden = false; if (champ) champ.focus(); };
       errBox.hidden = true;
       if (!$("#repoFields").hidden) {
         S.owner = $("#inOwner").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/.*$/, "");
         S.repo = $("#inRepo").value.trim().replace(/\.git$/, "");
       }
-      const tok = $("#inToken").value.trim();
-      if (!S.owner || !S.repo) { errBox.textContent = "Indiquez le compte GitHub et le nom du dépôt."; errBox.hidden = false; return; }
-      if (!tok) { errBox.textContent = "Collez votre clé d'accès GitHub."; errBox.hidden = false; return; }
+      const tok = $("#inToken").value.trim(), code = $("#inCode").value;
+      if (!S.owner || !S.repo) return stop("Indiquez le compte GitHub et le nom du dépôt.");
+      if (!tok) return stop("Collez votre clé d'accès GitHub.", $("#inToken"));
+      const pb = codeFaible(code);
+      if (pb) return stop(pb, $("#inCode"));
+      if (code !== $("#inCode2").value) return stop("Les deux codes ne sont pas identiques.", $("#inCode2"));
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Connexion…';
       try {
-        await connecter(tok, $("#inRemember").checked);
+        await connecter(tok, { code, local: $("#inRemember").checked });
       } catch (er) {
-        errBox.textContent = er.status === undefined ? er.message : messageErreur(er);
-        errBox.hidden = false;
+        S.token = "";
+        stop(er.status === undefined ? er.message : messageErreur(er));
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Se connecter';
       }
     };
+
+    // verrouillage
+    $("#lockForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const errBox = $("#lockErr"), btn = $("#unlockBtn"), code = $("#inUnlock").value;
+      const stop = (m) => { errBox.textContent = m; errBox.hidden = false; $("#inUnlock").focus(); };
+      errBox.hidden = true;
+      if (modeVerrou === "choisir") {
+        const pb = codeFaible(code) || (code !== $("#inUnlock2").value ? "Les deux codes ne sont pas identiques." : "");
+        if (pb) return stop(pb);
+      } else if (!code) return stop("Entrez votre code.");
+      const avant = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Vérification…';
+      try {
+        if (modeVerrou === "choisir") { await connecter(S.ancien.token, { code, local: S.ancien.local }); return; }
+        const tok = await ouvrirCoffre(code);
+        if (!tok) {
+          const n = (Number(keep.get(ESSAIS)) || 0) + 1, reste = MAX_ESSAIS - n;
+          if (reste <= 0) {
+            oublierCle();
+            return retourConnexion("Trop d'essais incorrects. Pour votre sécurité, la clé a été retirée de cet appareil. Reconnectez-vous avec votre clé GitHub et choisissez un nouveau code.");
+          }
+          keep.set(ESSAIS, String(n));
+          $("#inUnlock").value = "";
+          return stop(`Code incorrect. Encore ${reste} essai${reste > 1 ? "s" : ""}, ensuite la clé sera retirée de cet appareil.`);
+        }
+        keep.del(ESSAIS);
+        if (S.pret) { S.token = tok; deverrouiller(); }
+        else await connecter(tok, null);
+      } catch (er) {
+        S.token = "";
+        if (er.status === 0) stop(er.message);            // pas d'internet : la clé reste gardée
+        else { oublierCle(); retourConnexion(er.status === undefined ? er.message : messageErreur(er)); }
+      } finally {
+        btn.disabled = false;
+        if (!$("#lock").hidden) btn.innerHTML = avant;
+      }
+    };
+    $("#lockForgot").onclick = () => { oublierCle(); retourConnexion(""); };
+    $("#lockBtn").onclick = () => verrouiller(false);
+    const bouge = () => { if (!verrouille) derniereActivite = Date.now(); };
+    ["pointerdown", "keydown", "wheel", "touchstart", "input", "scroll"].forEach((ev) => document.addEventListener(ev, bouge, { passive: true, capture: true }));
+    let dernierMvt = 0;
+    document.addEventListener("mousemove", () => { const t = Date.now(); if (t - dernierMvt > 4000) { dernierMvt = t; bouge(); } }, { passive: true });
+    setInterval(verifierVeille, 20000);
+    document.addEventListener("visibilitychange", verifierVeille);
 
     // en-tête
     $("#themeBtn").onclick = () => {
@@ -759,11 +931,9 @@
       const n = nbChangements();
       const ok = await ask("Se déconnecter ?", n ? "Vos modifications non publiées restent enregistrées sur cet appareil." : "La clé sera retirée de cet appareil.", "Se déconnecter");
       if (!ok) return;
-      keep.del("zt-admin-cle");
-      S.token = "";
-      $("#inToken").value = "";
-      $("#app").hidden = true;
-      $("#login").hidden = false;
+      oublierCle();
+      S.pret = false;
+      retourConnexion("");
     };
 
     // outils
@@ -868,9 +1038,15 @@
       }
     };
 
+    // photo introuvable dans la liste : icône à la place (sans code dans la page)
+    document.addEventListener("error", (e) => {
+      const t = e.target;
+      if (t && t.tagName === "IMG" && t.closest(".thumb")) t.replaceWith(Object.assign(document.createElement("i"), { className: "fas fa-image" }));
+    }, true);
+
     // clavier, fermeture de la page
     document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
+      if (e.key !== "Escape" || !$("#lock").hidden) return;
       if (!$("#dialog").hidden) $("#dlgNo").click();
       else if ($("#seoPanel").classList.contains("on")) fermerSeo();
       else if ($("#newsPanel").classList.contains("on")) { if (nEdit) { nEdit = null; newsMode(false); } else fermerNews(); }
@@ -885,17 +1061,14 @@
   async function demarrer() {
     brancher();
     chargerReglages();
-    const tok = keep.get("zt-admin-cle", true) || keep.get("zt-admin-cle");
-    if (tok && S.owner && S.repo) {
-      $("#login").hidden = true;
-      try {
-        await connecter(tok, !!keep.get("zt-admin-cle"));
-        return;
-      } catch (e) {
-        $("#login").hidden = false;
-        $("#loginErr").textContent = e.status === undefined ? e.message : messageErreur(e);
-        $("#loginErr").hidden = false;
-      }
+    if (!S.owner || !S.repo) return;
+    // clé chiffrée : on demande le code
+    if (coffre()) return montrerVerrou("ouvrir");
+    // ancienne version : la clé était gardée en clair. On la protège tout de suite.
+    const ancienne = keep.get("zt-admin-cle", true) || keep.get("zt-admin-cle");
+    if (ancienne) {
+      S.ancien = { token: ancienne, local: !!keep.get("zt-admin-cle") };
+      montrerVerrou("choisir");
     }
   }
   demarrer();

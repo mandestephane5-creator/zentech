@@ -15,12 +15,31 @@ Quand vous cliquez sur « Publier », les changements sont enregistrés sur GitH
    ```
 3. **Mettre le site en ligne** : sur GitHub, dans le dépôt, ouvrez **Settings**, puis **Pages**. Choisissez la branche **main** et le dossier **/ (root)**, puis cliquez sur **Save**.
 4. **Créer la clé d'accès** :
-   - Sur github.com, ouvrez **Settings** (photo de profil), puis **Developer settings**, **Personal access tokens** et **Fine-grained tokens**.
-   - Cliquez sur **Generate new token**. Nom : « ZenTech admin ». Expiration : 1 an.
-   - **Repository access** : *Only select repositories*, puis choisissez le dépôt du site.
-   - **Permissions** : **Contents**, réglé sur *Read and write*.
-   - Cliquez sur **Generate token** et copiez la clé (elle commence par `github_pat_`).
-5. **Ouvrir l'admin** : `https://VOTRE-COMPTE.github.io/VOTRE-DEPOT/admin.html`. Collez la clé et cliquez sur **Se connecter**. Le dépôt est reconnu automatiquement.
+   - Connecté à GitHub, ouvrez `https://github.com/settings/tokens/new`.
+   - **Note** : « ZenTech admin ». **Expiration** : *Custom*, dans un an.
+   - **Select scopes** : cochez uniquement **public_repo**.
+   - Cliquez sur **Generate token** et copiez la clé (elle commence par `ghp_`). GitHub ne l'affiche qu'une seule fois.
+5. **Ouvrir l'admin** : `https://mandestephane5-creator.github.io/zentech/admin.html`. Collez la clé, choisissez un **code de verrouillage** (6 caractères minimum), puis cliquez sur **Se connecter**. Le dépôt est reconnu automatiquement.
+
+## Le code de verrouillage
+
+- La clé GitHub se colle une seule fois. Elle reste masquée pendant la saisie, ne peut pas être copiée depuis la page et n'est plus jamais affichée ensuite.
+- Elle n'est jamais gardée en clair sur l'appareil : elle est chiffrée avec votre code. Sans le code, elle est illisible.
+- Le code est demandé à chaque ouverture de l'admin, et après **10 minutes sans activité**.
+- Vous partez de votre poste ? Cliquez sur l'icône **cadenas** en haut de l'admin pour verrouiller tout de suite. Vos modifications en cours sont gardées.
+- Après **5 codes faux**, la clé est retirée de l'appareil : il faut se reconnecter avec la clé GitHub et choisir un nouveau code.
+- **Code oublié ?** Cliquez sur « Code oublié » : reconnectez-vous avec votre clé GitHub et choisissez un nouveau code.
+- Le code est propre à chaque appareil. Vous pouvez prendre le même sur l'ordinateur et sur le téléphone.
+- Choisissez un code difficile à deviner : 8 caractères ou plus, avec des lettres et des chiffres. Évitez les dates de naissance et les suites comme 123456.
+- Si « Rester connecté » est décoché, la clé est oubliée dès que l'onglet est fermé.
+
+## Donner l'accès à un vendeur
+
+Chaque personne a sa propre clé. Ne partagez pas la vôtre.
+1. La personne crée un compte gratuit sur github.com et vous donne son nom d'utilisateur.
+2. Ouvrez `https://github.com/mandestephane5-creator/zentech/settings/access`, cliquez sur **Add people** et ajoutez ce nom.
+3. Elle accepte l'invitation reçue par e-mail, puis crée sa propre clé (étape 4 ci-dessus) et se connecte à l'admin avec son propre code.
+4. Quand elle quitte la boutique, retournez sur la même page et cliquez sur **Remove** : sa clé ne fonctionne plus immédiatement.
 
 ## Utilisation
 
@@ -62,8 +81,9 @@ Sans cela, `git push` sera refusé.
 
 ## Sécurité
 
-- La clé permet de modifier le site. Ne la partagez qu'avec les personnes qui gèrent la boutique.
-- En cas de perte de la clé ou de changement de vendeur, supprimez-la sur GitHub (au même endroit qu'à l'étape 4) et créez-en une nouvelle.
+- La clé permet de modifier le site. Ne l'envoyez jamais par WhatsApp ou par e-mail, et ne la partagez avec personne : chaque vendeur a la sienne.
+- En cas de perte de la clé, supprimez-la sur `https://github.com/settings/tokens` et créez-en une nouvelle.
+- Sur le PC de l'entreprise, verrouillez aussi la session Windows quand vous vous absentez (touches Windows + L).
 - Le fichier `data/produits.json` est public. N'y mettez jamais de prix d'achat ni d'informations internes.
 
 ## L'ancien serveur

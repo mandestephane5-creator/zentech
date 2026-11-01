@@ -6,8 +6,11 @@
   <title>ZenTech — Gestion des articles</title>
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#0b0b0f">
-  <script>try{var t=localStorage.getItem('zt-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-EeimED1IREj3G/qnrdVkHORsLpht5QhGbYsWZCo7j1M='; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <style id="antiCadre">html{display:none!important}</style>
+  <script>if(window.top===window.self){var c=document.getElementById('antiCadre');c.parentNode.removeChild(c)}else{try{window.top.location.replace(window.location.href)}catch(e){}}try{var t=localStorage.getItem('zt-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/admin.css">
@@ -33,11 +36,22 @@
 
       <label class="fld">
         <span>Clé d'accès GitHub</span>
-        <div class="pw">
-          <input id="inToken" type="password" placeholder="github_pat_…" spellcheck="false" autocomplete="off" required>
-          <button type="button" class="pw-eye" id="eye" aria-label="Afficher la clé"><i class="fas fa-eye"></i></button>
-        </div>
+        <input id="inToken" class="secret" type="text" placeholder="Collez la clé ici (ghp_…)" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" data-lpignore="true" data-1p-ignore data-bwignore data-form-type="other" required>
+        <small class="secret-note"><i class="fas fa-eye-slash"></i> La clé reste masquée et ne sera plus jamais affichée.</small>
       </label>
+
+      <div class="lock-set">
+        <label class="fld">
+          <span>Code de verrouillage de l'admin</span>
+          <div class="pw">
+            <input id="inCode" class="secret" type="text" maxlength="64" placeholder="6 caractères minimum" spellcheck="false" autocomplete="off" autocapitalize="off" data-lpignore="true" data-1p-ignore data-bwignore required>
+            <button type="button" class="pw-eye" data-eye="inCode" aria-label="Afficher le code"><i class="fas fa-eye"></i></button>
+          </div>
+        </label>
+        <label class="fld"><span>Confirmez le code</span><input id="inCode2" class="secret" type="text" maxlength="64" spellcheck="false" autocomplete="off" autocapitalize="off" data-lpignore="true" data-1p-ignore data-bwignore required></label>
+        <p class="lock-note"><i class="fas fa-shield-halved"></i> Ce code vous sera demandé sur cet appareil à chaque ouverture de l'admin et après 10 minutes sans activité. Sans lui, la clé GitHub enregistrée reste illisible.</p>
+      </div>
+
       <label class="check"><input type="checkbox" id="inRemember" checked><span>Rester connecté sur cet appareil</span></label>
 
       <p class="err" id="loginErr" hidden></p>
@@ -47,15 +61,35 @@
     <details class="help">
       <summary><i class="fas fa-circle-question"></i> Comment obtenir ma clé ?</summary>
       <ol>
-        <li>Sur <b>github.com</b>, ouvrez <b>Settings</b> (photo de profil en haut à droite).</li>
-        <li>Tout en bas à gauche : <b>Developer settings</b>, puis <b>Personal access tokens</b>, puis <b>Fine-grained tokens</b>.</li>
-        <li>Cliquez <b>Generate new token</b>. Nom : « ZenTech admin ». Expiration : 1 an.</li>
-        <li><b>Repository access</b> : <i>Only select repositories</i>, puis choisissez le dépôt du site.</li>
-        <li><b>Permissions</b> → <b>Contents</b> : <i>Read and write</i>.</li>
+        <li>Connecté à votre compte, ouvrez <b>github.com/settings/tokens/new</b>.</li>
+        <li><b>Note</b> : « ZenTech admin ». <b>Expiration</b> : <i>Custom</i>, dans un an.</li>
+        <li>Dans <b>Select scopes</b>, cochez uniquement <b>public_repo</b>.</li>
         <li>Cliquez <b>Generate token</b>, copiez la clé et collez-la ci-dessus.</li>
       </ol>
-      <p class="help-note">Gardez cette clé secrète : elle permet de modifier le site. Vous pouvez la supprimer à tout moment sur GitHub.</p>
+      <p class="help-note">Une clé par personne : chaque vendeur crée la sienne avec son propre compte GitHub, ajouté au dépôt dans Settings, puis Collaborators. Gardez votre clé secrète et supprimez-la sur GitHub en cas de perte.</p>
     </details>
+  </div>
+</section>
+
+<!-- ===================== VERROUILLAGE ===================== -->
+<section class="login lock" id="lock" hidden>
+  <div class="login-card">
+    <div class="lock-ico"><i class="fas fa-lock"></i></div>
+    <h2 class="lock-title" id="lockTitle">Admin verrouillé</h2>
+    <p class="login-sub" id="lockSub">Entrez votre code de verrouillage pour continuer.</p>
+    <form id="lockForm" autocomplete="off">
+      <label class="fld">
+        <span>Code de verrouillage</span>
+        <div class="pw">
+          <input id="inUnlock" class="secret" type="text" maxlength="64" spellcheck="false" autocomplete="off" autocapitalize="off" data-lpignore="true" data-1p-ignore data-bwignore required>
+          <button type="button" class="pw-eye" data-eye="inUnlock" aria-label="Afficher le code"><i class="fas fa-eye"></i></button>
+        </div>
+      </label>
+      <label class="fld" id="lockCode2" hidden><span>Confirmez le code</span><input id="inUnlock2" class="secret" type="text" maxlength="64" spellcheck="false" autocomplete="off" autocapitalize="off" data-lpignore="true" data-1p-ignore data-bwignore></label>
+      <p class="err" id="lockErr" hidden></p>
+      <button class="btn btn-red btn-block" type="submit" id="unlockBtn"><i class="fas fa-unlock"></i> Déverrouiller</button>
+    </form>
+    <button type="button" class="link lock-forgot" id="lockForgot">Code oublié ? Se reconnecter avec la clé GitHub</button>
   </div>
 </section>
 
@@ -69,6 +103,7 @@
       <button class="ib" id="seoBtn" title="Référencement Google" aria-label="Référencement Google"><i class="fas fa-magnifying-glass-chart"></i></button>
       <button class="ib" id="themeBtn" title="Mode clair / sombre" aria-label="Mode clair ou sombre"><i class="fas fa-circle-half-stroke"></i></button>
       <a class="ib" href="./" target="_blank" rel="noopener" title="Voir le site" aria-label="Voir le site"><i class="fas fa-store"></i></a>
+      <button class="ib" id="lockBtn" title="Verrouiller l'admin" aria-label="Verrouiller l'admin"><i class="fas fa-lock"></i></button>
       <button class="ib" id="logoutBtn" title="Se déconnecter" aria-label="Se déconnecter"><i class="fas fa-right-from-bracket"></i></button>
     </div>
   </header>

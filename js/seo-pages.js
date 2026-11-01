@@ -48,6 +48,21 @@
       '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","' + ga + '");</script>\n';
   }
 
+  // ----- Sécurité des pages publiques -----
+  // CSP : le navigateur refuse tout script, style, police ou cadre venant d'un autre site que ceux listés.
+  var CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
+    "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https:; " +
+    "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; " +
+    "frame-src https://www.google.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; " +
+    "form-action 'self'; upgrade-insecure-requests";
+  var FA_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+  var FA_SRI = 'sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==';
+  function securite() {
+    return '<meta http-equiv="Content-Security-Policy" content="' + CSP + '">\n' +
+      '<meta name="referrer" content="strict-origin-when-cross-origin">\n';
+  }
+
   // ----- Outils -----
   function esc(v) {
     return String(v == null ? '' : v)
@@ -75,9 +90,17 @@
     var i = c.lastIndexOf(' ');
     return (i > max * 0.6 ? c.slice(0, i) : c).replace(/[\s,;:.–-]+$/, '') + '…';
   }
+  // Adresse du site : seulement http(s), sans ?paramètres ni #ancre, caractères spéciaux encodés.
+  // Une adresse invalide ou piégée est remplacée par l'adresse par défaut.
   function base(u) {
-    u = String(u || SITE_PAR_DEFAUT).trim();
-    return u.charAt(u.length - 1) === '/' ? u : u + '/';
+    u = String(u || '').trim();
+    if (!u) return SITE_PAR_DEFAUT;
+    try {
+      var x = new URL(/^https?:\/\//i.test(u) ? u : 'https://' + u);
+      if (!/^https?:$/.test(x.protocol) || !/\./.test(x.hostname) || x.username || x.password) return SITE_PAR_DEFAUT;
+      var h = (x.origin + x.pathname).replace(/'/g, '%27');
+      return h.charAt(h.length - 1) === '/' ? h : h + '/';
+    } catch (e) { return SITE_PAR_DEFAUT; }
   }
   function cheminImg(img) { return encodeURI(String(img || '')).replace(/#/g, '%23'); }
   function imgAbs(img, b) { return /^https?:/i.test(img) ? img : b + cheminImg(img); }
@@ -135,6 +158,7 @@
     return '<!DOCTYPE html>\n<html lang="fr" data-theme="dark">\n<head>\n' +
       '<meta charset="UTF-8">\n' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+      securite() +
       '<title>' + esc(o.titre) + '</title>\n' +
       '<meta name="description" content="' + esc(o.description) + '">\n' +
       (o.noindex ? '<meta name="robots" content="noindex">\n' : '<link rel="canonical" href="' + esc(o.url) + '">\n') +
@@ -153,7 +177,7 @@
       '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
       '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">\n' +
       '<link rel="stylesheet" href="' + o.p + 'css/produit.css">\n' +
-      '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media=\'all\'">\n' +
+      '<link rel="stylesheet" href="' + FA_CSS + '" integrity="' + FA_SRI + '" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media=\'all\'">\n' +
       (o.ld || '') + '\n' + statistiques(o.ga) + '</head>\n<body>\n';
   }
 
@@ -339,6 +363,7 @@
     b = base(b);
     return '<!DOCTYPE html>\n<html lang="fr">\n<head>\n<meta charset="UTF-8">\n' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+      securite() +
       '<title>Page introuvable | ZenTech</title>\n<meta name="robots" content="noindex">\n' +
       '<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0a0a0a;color:#fff;font-family:"Segoe UI",system-ui,sans-serif;text-align:center;padding:24px;' +
       'background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px}' +
@@ -346,7 +371,7 @@
       'a{display:inline-block;margin:4px;padding:12px 20px;border-radius:10px;background:#ff0000;color:#fff;text-decoration:none;font-weight:600}a.g{background:rgba(255,255,255,.08)}</style>\n' +
       '</head>\n<body>\n<main><b>404</b><h1>Cette page n\'existe pas ou plus</h1>' +
       '<p>L\'article a peut-être été retiré ou renommé.</p>' +
-      '<a href="' + b + '">Accueil ZenTech</a><a class="g" href="' + b + 'produits.html">Voir le catalogue</a></main>\n</body>\n</html>\n';
+      '<a href="' + esc(b) + '">Accueil ZenTech</a><a class="g" href="' + esc(b) + 'produits.html">Voir le catalogue</a></main>\n</body>\n</html>\n';
   }
 
   // ----- Accueil : partie de l'en-tête qui dépend de l'adresse du site et des réglages Google -----
@@ -414,8 +439,8 @@
   // ----- Page Actualités -----
   function dateFr(d) {
     var m = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    var x = String(d || '').split('-');
-    return x.length === 3 ? Number(x[2]) + ' ' + m[Number(x[1]) - 1] + ' ' + x[0] : '';
+    var x = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d || ''));
+    return x && m[Number(x[2]) - 1] ? Number(x[3]) + ' ' + m[Number(x[2]) - 1] + ' ' + x[1] : '';
   }
   function paragraphes(t) {
     return String(t || '').split(/\n\s*\n/).map(function (q) { return q.trim(); }).filter(Boolean)
@@ -480,7 +505,7 @@
   }
 
   return {
-    BOUTIQUE: BOUTIQUE, SITE_PAR_DEFAUT: SITE_PAR_DEFAUT,
+    BOUTIQUE: BOUTIQUE, SITE_PAR_DEFAUT: SITE_PAR_DEFAUT, CSP: CSP, FA_SRI: FA_SRI, base: base,
     slugify: slugify, attribuerSlugs: attribuerSlugs, titre: titre, description: description,
     urlProduit: urlProduit, base: base, generer: generer, prix: prix,
     idGA: idGA, codeGSC: codeGSC, blocAccueil: blocAccueil, majAccueil: majAccueil, dateFr: dateFr
