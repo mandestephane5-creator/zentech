@@ -1,0 +1,341 @@
+[
+  {
+    "id": 1,
+    "nom": "HP EliteBook 840 G8",
+    "categorie": "Ordinateurs",
+    "prix": 315000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/hp-elitebook-840-g8.webp",
+    "desc": "Ordinateur portable professionnel HP EliteBook 840 G8 : écran 14 pouces Full HD, Intel Core i5 de 11e génération et SSD 512 Go. Idéal pour le bureau et les déplacements.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Processeur": "Intel Core i5 11e génération",
+      "RAM": "8 Go",
+      "Stockage": "512 Go SSD",
+      "Écran": "14 pouces Full HD",
+      "Système": "Windows 11 Pro"
+    },
+    "slug": "hp-elitebook-840-g8"
+  },
+  {
+    "id": 2,
+    "nom": "Écouteurs sans fil LOOMIC",
+    "categorie": "Écouteurs",
+    "prix": 15000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "new",
+    "img": "img/produits/ecouteurs-sans-fil-loomic.webp",
+    "desc": "Écouteurs Bluetooth sans fil LOOMIC, livrés avec leur boîtier de charge compact. Pratiques pour la musique, les vidéos et les appels au quotidien.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Connexion": "Bluetooth sans fil",
+      "Boîtier": "Boîtier de charge",
+      "Coloris": "Noir"
+    },
+    "slug": "ecouteurs-sans-fil-loomic"
+  },
+  {
+    "id": 3,
+    "nom": "Montre connectée HiFuture, appels Bluetooth",
+    "categorie": "Montres",
+    "prix": 25000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "new",
+    "img": "img/produits/montre-connectee-hifuture-appels-bluetooth.webp",
+    "desc": "Montre connectée HiFuture avec appels Bluetooth, suivi d'activité et des séances de sport. Disponible en bleu, marron, noir et rose.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Fonctions": "Appels Bluetooth, suivi d'activité",
+      "Coloris": "Bleu, marron, noir, rose"
+    },
+    "slug": "montre-connectee-hifuture-appels-bluetooth"
+  },
+  {
+    "id": 4,
+    "nom": "Chaise gaming LOOMIC avec repose-pieds",
+    "categorie": "Chaises Gaming",
+    "prix": 175000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/chaise-gaming-loomic-repose-pieds.webp",
+    "desc": "Chaise gaming LOOMIC orange et noir, avec coussin d'appui-tête et repose-pieds escamotable, pour jouer ou travailler confortablement.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Repose-pieds": "Escamotable",
+      "Appui-tête": "Coussin",
+      "Coloris": "Orange et noir"
+    },
+    "slug": "chaise-gaming-loomic-avec-repose-pieds"
+  },
+  {
+    "id": 5,
+    "nom": "Chargeur LOOMIC 45 W GaN USB-C et USB-A",
+    "categorie": "Câbles & Charge",
+    "prix": 12500,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "new",
+    "img": "img/produits/chargeur-loomic-45w-gan.webp",
+    "desc": "Chargeur secteur compact LOOMIC 45 W en technologie GaN, avec un port USB-C et un port USB-A pour charger téléphone, tablette et accessoires.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Puissance": "45 W",
+      "Technologie": "GaN",
+      "Ports": "1 USB-C, 1 USB-A",
+      "Coloris": "Blanc ou noir"
+    },
+    "slug": "chargeur-loomic-45-w-gan-usb-c-et-usb-a"
+  },
+  {
+    "id": 6,
+    "nom": "Power bank LOOMIC avec écran",
+    "categorie": "Power Banks",
+    "prix": 22500,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "new",
+    "img": "img/produits/power-bank-loomic-ecran.webp",
+    "desc": "Batterie externe LOOMIC avec écran qui affiche le niveau de charge, et ports USB-C et USB-A pour recharger partout.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Écran": "Niveau de charge",
+      "Ports": "USB-C, USB-A",
+      "Coloris": "Gris"
+    },
+    "slug": "power-bank-loomic-avec-ecran"
+  },
+  {
+    "id": 7,
+    "nom": "Lenovo ThinkPad X1 Carbon",
+    "categorie": "Ordinateurs",
+    "prix": 395000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/lenovo-thinkpad-x1-carbon.webp",
+    "desc": "Ultraportable professionnel Lenovo ThinkPad X1 Carbon : léger, robuste et pensé pour travailler partout. Configuration sur demande.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Gamme": "ThinkPad X1 Carbon",
+      "Coloris": "Noir"
+    },
+    "slug": "lenovo-thinkpad-x1-carbon"
+  },
+  {
+    "id": 8,
+    "nom": "Montre connectée HiFuture, bracelet milanais",
+    "categorie": "Montres",
+    "prix": 30000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/montre-connectee-hifuture-bracelet-milanais.webp",
+    "desc": "Montre connectée ronde HiFuture avec bracelet milanais en maille métal, élégante au bureau comme en soirée. Coloris noir, or ou argent.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Cadran": "Rond",
+      "Bracelet": "Milanais (maille métal)",
+      "Coloris": "Noir, or, argent"
+    },
+    "slug": "montre-connectee-hifuture-bracelet-milanais"
+  },
+  {
+    "id": 9,
+    "nom": "Écouteurs sans fil EarFun",
+    "categorie": "Écouteurs",
+    "prix": 25000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/ecouteurs-sans-fil-earfun.webp",
+    "desc": "Écouteurs Bluetooth sans fil EarFun à tige, avec boîtier de charge de poche.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Connexion": "Bluetooth sans fil",
+      "Boîtier": "Boîtier de charge",
+      "Coloris": "Noir"
+    },
+    "slug": "ecouteurs-sans-fil-earfun"
+  },
+  {
+    "id": 10,
+    "nom": "HP ProBook 440 G7",
+    "categorie": "Ordinateurs",
+    "prix": 275000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/hp-probook-440-g7.webp",
+    "desc": "Ordinateur portable HP ProBook 440 G7 : écran 14 pouces Full HD, Intel Core i5, 8 Go de RAM et SSD 512 Go. Parfait pour la bureautique et les études.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Processeur": "Intel Core i5",
+      "RAM": "8 Go",
+      "Stockage": "512 Go SSD",
+      "Écran": "14 pouces Full HD",
+      "Système": "Windows 10 Pro"
+    },
+    "slug": "hp-probook-440-g7"
+  },
+  {
+    "id": 11,
+    "nom": "Chaise gaming noire, appui-tête réglable",
+    "categorie": "Chaises Gaming",
+    "prix": 150000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/chaise-gaming-noire-appui-tete.webp",
+    "desc": "Chaise gaming ergonomique noire avec appui-tête réglable et accoudoirs, idéale pour le bureau comme pour le gaming.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Appui-tête": "Réglable",
+      "Coloris": "Noir"
+    },
+    "slug": "chaise-gaming-noire-appui-tete-reglable"
+  },
+  {
+    "id": 12,
+    "nom": "Pack de charge LOOMIC",
+    "categorie": "Câbles & Charge",
+    "prix": 39500,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/pack-de-charge-loomic.webp",
+    "desc": "Pack de charge LOOMIC : power bank, câbles USB-C et Lightning et chargeurs 45 W, pour tout recharger à la maison comme en déplacement.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Contenu": "Power bank, câbles USB-C et Lightning, chargeurs 45 W"
+    },
+    "slug": "pack-de-charge-loomic"
+  },
+  {
+    "id": 13,
+    "nom": "Dell Precision, station de travail portable",
+    "categorie": "Ordinateurs",
+    "prix": 650000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/dell-precision-station-de-travail.webp",
+    "desc": "Station de travail portable Dell Precision pour le montage vidéo, la 3D et les logiciels professionnels exigeants. Configuration sur demande.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Gamme": "Dell Precision",
+      "Usage": "Montage vidéo, 3D, CAO"
+    },
+    "slug": "dell-precision-station-de-travail-portable"
+  },
+  {
+    "id": 14,
+    "nom": "Montre connectée HiFuture ronde, bracelet sport",
+    "categorie": "Montres",
+    "prix": 27500,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/montre-connectee-hifuture-ronde-sport.webp",
+    "desc": "Montre connectée ronde HiFuture avec bracelet sport en silicone, pour le quotidien et l'entraînement. Coloris noir ou beige.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Cadran": "Rond",
+      "Bracelet": "Silicone sport",
+      "Coloris": "Noir, beige"
+    },
+    "slug": "montre-connectee-hifuture-ronde-bracelet-sport"
+  },
+  {
+    "id": 15,
+    "nom": "Fauteuil gaming inclinable avec repose-pieds",
+    "categorie": "Chaises Gaming",
+    "prix": 225000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/fauteuil-gaming-inclinable.webp",
+    "desc": "Fauteuil gaming inclinable noir avec repose-pieds intégré et surpiqûres en losange, pour se détendre devant un film ou une partie.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Dossier": "Inclinable",
+      "Repose-pieds": "Intégré",
+      "Coloris": "Noir"
+    },
+    "slug": "fauteuil-gaming-inclinable-avec-repose-pieds"
+  },
+  {
+    "id": 16,
+    "nom": "Montre connectée HiFuture, écran carré",
+    "categorie": "Montres",
+    "prix": 20000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/montre-connectee-hifuture-ecran-carre.webp",
+    "desc": "Montre connectée HiFuture à grand écran carré et cadre argenté, avec bracelet en silicone noir.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Écran": "Grand écran carré",
+      "Bracelet": "Silicone",
+      "Coloris": "Argent et noir"
+    },
+    "slug": "montre-connectee-hifuture-ecran-carre"
+  },
+  {
+    "id": 17,
+    "nom": "Adaptateur USB-C Hub UGREEN",
+    "categorie": "Accessoires",
+    "prix": 12000,
+    "ancienPrix": null,
+    "qte": null,
+    "visible": true,
+    "badge": "",
+    "img": "img/produits/adaptateur-usb-c-hub-ugreen.webp",
+    "desc": "Hub multiport USB-C UGREEN compatible avec la majorité des ordinateurs portables : HDMI, ports USB, Ethernet et lecteur de cartes.",
+    "note": 0,
+    "avis": 0,
+    "specs": {
+      "Connecteurs": "USB-C / 3x USB-A / HDMI",
+      "Débit": "5 Gbps",
+      "Garantie": "1 an"
+    },
+    "slug": "adaptateur-usb-c-hub-ugreen"
+  }
+]

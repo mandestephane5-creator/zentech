@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZenTech — Hors ligne</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff0000">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      /* CORRECTION : pas de overflow:hidden, on laisse défiler */
+      padding: 40px 20px 60px;
+    }
+
+    /* Fond décoratif fixe */
+    .bg-deco {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(255,0,0,.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 70%, rgba(255,0,0,.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Contenu centré et scrollable */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      margin-bottom: 36px;
+      animation: fadeDown .6s ease both;
+    }
+    .logo span { color: #ff0000; }
+
+    /* Icône wifi coupé */
+    .wifi-icon {
+      width: 90px;
+      height: 90px;
+      background: rgba(255,0,0,.08);
+      border: 2px solid rgba(255,0,0,.2);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      animation: fadeDown .6s .1s ease both;
+    }
+
+    .wifi-icon svg {
+      width: 46px;
+      height: 46px;
+      stroke: #ff0000;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.93); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+      text-align: center;
+      animation: fadeDown .6s .2s ease both;
+    }
+
+    .subtitle {
+      font-size: .9rem;
+      color: rgba(255,255,255,.5);
+      line-height: 1.75;
+      margin-bottom: 32px;
+      text-align: center;
+      animation: fadeDown .6s .3s ease both;
+    }
+
+    /* Carte disponible offline */
+    .offline-card {
+      width: 100%;
+      background: #161616;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      animation: fadeDown .6s .4s ease both;
+    }
+
+    .offline-card h3 {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.3);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .offline-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .offline-item:last-child { border-bottom: none; }
+
+    .offline-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,0,0,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .offline-item-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #ff0000;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .offline-item-text strong {
+      display: block;
+      font-size: .85rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .offline-item-text span {
+      font-size: .75rem;
+      color: rgba(255,255,255,.4);
+    }
+
+    /* Boutons */
+    .btn-retry {
+      width: 100%;
+      padding: 14px;
+      background: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: .92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      animation: fadeDown .6s .5s ease both;
+    }
+    .btn-retry:hover  { background: #cc0000; transform: translateY(-2px); }
+    .btn-retry:active { transform: scale(.98); }
+
+    .btn-retry svg {
+      width: 18px; height: 18px;
+      stroke: #fff; fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn-retry.loading svg { animation: spin .8s linear infinite; }
+
+    .btn-wa {
+      width: 100%;
+      padding: 13px;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      margin-bottom: 10px;
+      animation: fadeDown .6s .6s ease both;
+    }
+    .btn-wa:hover { background: #1da851; transform: translateY(-2px); }
+
+    .btn-wa svg { width: 18px; height: 18px; fill: #fff; }
+
+    /* Retour accueil (cache hors connexion) */
+    .btn-home {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: rgba(255,255,255,.4);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      margin-bottom: 24px;
+      animation: fadeDown .6s .65s ease both;
+    }
+    .btn-home:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,.3);
+    }
+    .btn-home svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2;
+    }
+
+    /* Statut connexion */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: .78rem;
+      color: rgba(255,255,255,.3);
+      animation: fadeDown .6s .7s ease both;
+      padding-bottom: 20px;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: blink 1.5s infinite;
+      flex-shrink: 0;
+    }
+    .status-dot.online {
+      background: #22c55e;
+      animation: none;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .2; }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body { padding: 28px 16px 50px; }
+      h1   { font-size: 1.3rem; }
+      .wifi-icon { width: 76px; height: 76px; }
+      .wifi-icon svg { width: 38px; height: 38px; }
+      .logo { font-size: 1.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fonds décoratifs fixes -->
+  <div class="bg-deco"></div>
+  <div class="bg-grid"></div>
+
+  <div class="container">
+
+    <!-- Logo -->
+    <div class="logo">Zen<span>Tech</span></div>
+
+    <!-- Icône wifi coupé -->
+    <div class="wifi-icon">
+      <svg viewBox="0 0 24 24">
+        <line x1="1" y1="1" x2="23" y2="23"/>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <circle cx="12" cy="20" r="1" fill="#ff0000" stroke="none"/>
+      </svg>
+    </div>
+
+    <h1>Pas de connexion</h1>
+    <p class="subtitle">
+      Vous êtes actuellement hors ligne.<br>
+      Certaines fonctionnalités restent disponibles.
+    </p>
+
+    <!-- Ce qui est dispo offline -->
+    <div class="offline-card">
+      <h3>Disponible hors ligne</h3>
+
+      <div class="offline-item">
+        <div class="offline-item-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+        </div>
+        <div class="offline-item-text">
+          <strong>Catalogue produits</strong>
+          <span>Voir les articles déjà chargés</span>
+        </div>
+      </div>
+
+      <div class="offline-item">
+        <div class="offline-item-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+          </svg>
+        </div>
+        <div class="offline-item-text">
+          <strong>Panier sauvegardé</strong>
+          <span>Vos articles sont conservés</span>
+        </div>
+      </div>
+
+      <div class="offline-item">
+        <div class="offline-item-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+          </svg>
+        </div>
+        <div class="offline-item-text">
+          <strong>Favoris</strong>
+          <span>Votre liste de souhaits</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bouton réessayer -->
+    <button class="btn-retry" id="btnRetry" onclick="reessayer()">
+      <svg viewBox="0 0 24 24" id="retryIcon">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Réessayer la connexion
+    </button>
+
+    <!-- WhatsApp -->
+    <a class="btn-wa" href="https://wa.me/22672256937" target="_blank">
+      <svg viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+        <path d="M12.004 2C6.479 2 2.005 6.474 2.005 12c0 1.767.465 3.535 1.35 5.086L2 22l5.04-1.322A10.004 10.004 0 0012.004 22C17.529 22 22 17.526 22 12c0-5.525-4.471-10-9.996-10zm0 18.36a8.356 8.356 0 01-4.252-1.163l-.305-.181-3.159.829.845-3.074-.2-.316A8.336 8.336 0 013.649 12c0-4.61 3.745-8.356 8.355-8.356 4.61 0 8.356 3.746 8.356 8.356 0 4.61-3.746 8.36-8.356 8.36z"/>
+      </svg>
+      Commander via WhatsApp
+    </a>
+
+    <!-- Retour à l'accueil depuis le cache -->
+    <a class="btn-home" href="./">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Retourner à l'accueil
+    </a>
+
+    <!-- Statut connexion -->
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Hors ligne</span>
+    </div>
+
+  </div>
+
+  <script>
+    function checkConnection() {
+      var dot  = document.getElementById('statusDot');
+      var text = document.getElementById('statusText');
+      if (navigator.onLine) {
+        dot.classList.add('online');
+        text.textContent = 'Connexion rétablie — rechargement...';
+        setTimeout(function() { window.location.href = './'; }, 1500);
+      } else {
+        dot.classList.remove('online');
+        text.textContent = 'Hors ligne';
+      }
+    }
+
+    function reessayer() {
+      var btn  = document.getElementById('btnRetry');
+      var icon = document.getElementById('retryIcon');
+      btn.classList.add('loading');
+      btn.disabled = true;
+      btn.textContent = 'Vérification...';
+
+      setTimeout(function() {
+        if (navigator.onLine) {
+          window.location.href = './';
+        } else {
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          btn.innerHTML =
+            '<svg viewBox="0 0 24 24" id="retryIcon" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">' +
+              '<polyline points="23 4 23 10 17 10"/>' +
+              '<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>' +
+            '</svg>' +
+            'Réessayer la connexion';
+          document.getElementById('statusText').textContent = 'Toujours hors ligne. Vérifiez votre connexion.';
+        }
+      }, 1500);
+    }
+
+    window.addEventListener('online',  checkConnection);
+    window.addEventListener('offline', checkConnection);
+    checkConnection();
+  </script>
+
+</body>
+</html>

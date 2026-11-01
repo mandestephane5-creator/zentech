@@ -1,0 +1,95 @@
+{
+  "name": "ZenTech — High-Tech Burkina Faso",
+  "short_name": "ZenTech",
+  "description": "Votre boutique high-tech de confiance au Burkina Faso. Ordinateurs, écouteurs, montres connectées, chaises gaming et accessoires.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ff0000",
+  "lang": "fr",
+  "categories": ["shopping", "technology"],
+  "icons": [
+    {
+      "src": "img/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nos Produits",
+      "short_name": "Produits",
+      "description": "Voir tous les articles ZenTech",
+      "url": "./#section-articles",
+      "icons": [{ "src": "img/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Nous Contacter",
+      "short_name": "Contact",
+      "description": "Contacter ZenTech via WhatsApp",
+      "url": "./#section-contact",
+      "icons": [{ "src": "img/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "img/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ZenTech boutique mobile"
+    },
+    {
+      "src": "img/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ZenTech boutique desktop"
+    }
+  ]
+}

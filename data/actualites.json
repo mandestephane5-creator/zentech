@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "titre": "Le nouveau site ZenTech est en ligne",
+    "date": "2026-10-31",
+    "visible": true,
+    "image": "img/produits/hp-elitebook-840-g8.webp",
+    "resume": "Retrouvez tout le catalogue ZenTech en ligne : ordinateurs, écouteurs, montres connectées, chaises gaming, chargeurs et power banks.",
+    "texte": "Chaque produit a maintenant sa propre page, avec ses photos, ses caractéristiques et son prix en francs CFA. Quand le prix n'est pas affiché, un bouton vous permet de le demander directement sur WhatsApp.\n\nVous pouvez commander en ligne ou sur WhatsApp. La livraison se fait en 24 h à Ouagadougou et en 2 à 4 jours dans les autres villes du Burkina Faso. Le paiement se fait par Orange Money, Moov Money ou à la livraison.\n\nLe site s'utilise aussi bien sur téléphone que sur ordinateur, en mode sombre ou en mode clair."
+  },
+  {
+    "id": 2,
+    "titre": "Bien choisir son ordinateur portable professionnel",
+    "date": "2026-10-30",
+    "visible": true,
+    "image": "img/produits/lenovo-thinkpad-x1-carbon.webp",
+    "resume": "Bureautique, études, déplacements ou montage vidéo : voici les points à regarder avant d'acheter.",
+    "texte": "Commencez par l'usage. Pour la bureautique, internet et les études, un processeur Intel Core i5 avec 8 Go de mémoire suffit dans la plupart des cas. Si vous gardez beaucoup de logiciels ouverts en même temps, visez plutôt 16 Go.\n\nPrivilégiez toujours un disque SSD : l'ordinateur démarre et ouvre les fichiers bien plus vite qu'avec un ancien disque dur. Un écran de 14 pouces est un bon compromis entre confort et poids si vous vous déplacez souvent.\n\nChez ZenTech, les HP EliteBook 840 G8 et HP ProBook 440 G7 conviennent très bien au travail de bureau. Le Lenovo ThinkPad X1 Carbon s'adresse à ceux qui veulent un ordinateur léger pour se déplacer. Pour le montage vidéo, la 3D ou les logiciels d'architecture, une station de travail comme le Dell Precision est plus adaptée.\n\nVous hésitez ? Écrivez-nous sur WhatsApp en précisant votre usage et votre budget, nous vous conseillons."
+  },
+  {
+    "id": 3,
+    "titre": "Chargeur GaN : plus petit, plus efficace",
+    "date": "2026-10-29",
+    "visible": true,
+    "image": "img/produits/chargeur-loomic-45w-gan.webp",
+    "resume": "Pourquoi les chargeurs GaN remplacent peu à peu les anciens chargeurs, et à quoi sert un modèle de 45 W.",
+    "texte": "GaN veut dire nitrure de gallium. Ce matériau chauffe moins que le silicium utilisé dans les anciens chargeurs, ce qui permet de fabriquer des chargeurs plus compacts pour la même puissance.\n\nUn chargeur de 45 W comme le LOOMIC 45 W GaN recharge rapidement les téléphones et les tablettes compatibles, et peut aussi alimenter certains ordinateurs portables légers qui se chargent en USB-C.\n\nAvec un port USB-C et un port USB-A, il permet de brancher deux appareils sur une seule prise, à la maison comme en voyage."
+  }
+]

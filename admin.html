@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ZenTech — Gestion des articles</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0b0b0f">
+  <script>try{var t=localStorage.getItem('zt-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ===================== CONNEXION ===================== -->
+<section class="login" id="login">
+  <div class="login-card">
+    <div class="brand">Zen<span>Tech</span></div>
+    <p class="login-sub">Gestion des articles et des prix</p>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="repo-line" id="repoLine">
+        <i class="fab fa-github"></i>
+        <span>Dépôt : <b id="repoLabel">—</b></span>
+        <button type="button" class="link" id="repoEdit">Modifier</button>
+      </div>
+      <div class="repo-fields" id="repoFields" hidden>
+        <label class="fld"><span>Compte GitHub</span><input id="inOwner" placeholder="mandestephane5-creator" spellcheck="false"></label>
+        <label class="fld"><span>Nom du dépôt</span><input id="inRepo" placeholder="zentech" spellcheck="false"></label>
+      </div>
+
+      <label class="fld">
+        <span>Clé d'accès GitHub</span>
+        <div class="pw">
+          <input id="inToken" type="password" placeholder="github_pat_…" spellcheck="false" autocomplete="off" required>
+          <button type="button" class="pw-eye" id="eye" aria-label="Afficher la clé"><i class="fas fa-eye"></i></button>
+        </div>
+      </label>
+      <label class="check"><input type="checkbox" id="inRemember" checked><span>Rester connecté sur cet appareil</span></label>
+
+      <p class="err" id="loginErr" hidden></p>
+      <button class="btn btn-red btn-block" type="submit" id="loginBtn"><i class="fas fa-right-to-bracket"></i> Se connecter</button>
+    </form>
+
+    <details class="help">
+      <summary><i class="fas fa-circle-question"></i> Comment obtenir ma clé ?</summary>
+      <ol>
+        <li>Sur <b>github.com</b>, ouvrez <b>Settings</b> (photo de profil en haut à droite).</li>
+        <li>Tout en bas à gauche : <b>Developer settings</b>, puis <b>Personal access tokens</b>, puis <b>Fine-grained tokens</b>.</li>
+        <li>Cliquez <b>Generate new token</b>. Nom : « ZenTech admin ». Expiration : 1 an.</li>
+        <li><b>Repository access</b> : <i>Only select repositories</i>, puis choisissez le dépôt du site.</li>
+        <li><b>Permissions</b> → <b>Contents</b> : <i>Read and write</i>.</li>
+        <li>Cliquez <b>Generate token</b>, copiez la clé et collez-la ci-dessus.</li>
+      </ol>
+      <p class="help-note">Gardez cette clé secrète : elle permet de modifier le site. Vous pouvez la supprimer à tout moment sur GitHub.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ===================== APPLICATION ===================== -->
+<div class="app" id="app" hidden>
+  <header class="top">
+    <div class="brand">Zen<span>Tech</span> <small>admin</small></div>
+    <div class="top-r">
+      <span class="sync" id="sync" hidden></span>
+      <button class="ib" id="newsBtn" title="Actualités" aria-label="Actualités"><i class="fas fa-newspaper"></i></button>
+      <button class="ib" id="seoBtn" title="Référencement Google" aria-label="Référencement Google"><i class="fas fa-magnifying-glass-chart"></i></button>
+      <button class="ib" id="themeBtn" title="Mode clair / sombre" aria-label="Mode clair ou sombre"><i class="fas fa-circle-half-stroke"></i></button>
+      <a class="ib" href="./" target="_blank" rel="noopener" title="Voir le site" aria-label="Voir le site"><i class="fas fa-store"></i></a>
+      <button class="ib" id="logoutBtn" title="Se déconnecter" aria-label="Se déconnecter"><i class="fas fa-right-from-bracket"></i></button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="head">
+      <div>
+        <h1>Articles</h1>
+        <p class="muted" id="repoInfo"></p>
+      </div>
+      <button class="btn btn-red" id="addBtn"><i class="fas fa-plus"></i> Ajouter un article</button>
+    </div>
+
+    <section class="stats" id="stats"></section>
+
+    <div class="tools">
+      <label class="search"><i class="fas fa-magnifying-glass"></i><input id="q" type="search" placeholder="Rechercher un article…"></label>
+      <select id="catSel" aria-label="Catégorie"><option value="">Toutes les catégories</option></select>
+      <div class="chips" id="chips">
+        <button class="chip on" data-v="tous">Tous</button>
+        <button class="chip" data-v="promo">En promo</button>
+        <button class="chip" data-v="rupture">Rupture</button>
+        <button class="chip" data-v="masques">Masqués</button>
+        <button class="chip" data-v="modifies">Modifiés</button>
+      </div>
+    </div>
+
+    <div class="list-head" aria-hidden="true"><span></span><span>Article</span><span>Prix</span><span>Stock</span><span>Visible</span><span></span></div>
+    <div class="list" id="list"></div>
+  </main>
+
+  <!-- barre de publication -->
+  <div class="pubbar" id="pubbar" hidden>
+    <div class="pub-txt"><i class="fas fa-pen"></i> <b id="pubCount">0</b> <span id="pubLabel">modification non publiée</span></div>
+    <div class="pub-acts">
+      <button class="btn btn-ghost" id="discardBtn">Annuler</button>
+      <button class="btn btn-red" id="publishBtn"><i class="fas fa-cloud-arrow-up"></i> Publier sur le site</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FICHE ARTICLE ===================== -->
+<div class="veil" id="veil" hidden></div>
+<aside class="editor" id="editor" aria-label="Fiche article" aria-hidden="true">
+  <div class="ed-head">
+    <h2 id="edTitle">Nouvel article</h2>
+    <button class="ib" id="edClose" aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+  </div>
+  <form class="ed-body" id="edForm" novalidate>
+    <div class="photo" id="photoBox">
+      <img id="edImg" alt="">
+      <div class="photo-empty" id="photoEmpty"><i class="fas fa-camera"></i><span>Ajouter une photo</span></div>
+      <input type="file" id="edFile" accept="image/*" hidden>
+    </div>
+    <div class="photo-acts">
+      <button type="button" class="btn btn-ghost btn-sm" id="photoBtn"><i class="fas fa-image"></i> <span id="photoBtnTxt">Choisir une photo</span></button>
+      <small class="muted">PNG détouré conseillé. La photo est réduite automatiquement.</small>
+    </div>
+
+    <label class="fld"><span>Nom de l'article *</span><input id="fNom" maxlength="90" required></label>
+    <label class="fld"><span>Catégorie *</span><input id="fCat" list="catList" maxlength="40" required placeholder="Ex. Ordinateurs"></label>
+    <datalist id="catList"></datalist>
+
+    <div class="row2">
+      <label class="fld"><span>Prix de vente (FCFA)</span><input id="fPrix" type="number" inputmode="numeric" min="0" step="100" placeholder="Vide = prix sur demande"></label>
+      <label class="fld"><span>Ancien prix (promo)</span><input id="fAncien" type="number" inputmode="numeric" min="0" step="100" placeholder="Vide = pas de promo"></label>
+    </div>
+    <p class="hint" id="promoHint" hidden></p>
+
+    <div class="row2">
+      <label class="fld"><span>Stock (quantité)</span>
+        <div class="qty"><button type="button" data-d="-1" aria-label="Retirer 1"><i class="fas fa-minus"></i></button><input id="fQte" type="number" inputmode="numeric" min="0" placeholder="Non suivi"><button type="button" data-d="1" aria-label="Ajouter 1"><i class="fas fa-plus"></i></button></div>
+      </label>
+      <div class="fld"><span>Étiquette</span>
+        <div class="seg" id="fBadge">
+          <label><input type="radio" name="badge" value=""><span>Aucune</span></label>
+          <label><input type="radio" name="badge" value="new"><span>Nouveau</span></label>
+          <label><input type="radio" name="badge" value="promo"><span>Promo</span></label>
+        </div>
+      </div>
+    </div>
+
+    <label class="switch-line"><span><b>Visible sur le site</b><small>Décochez pour cacher l'article sans le supprimer</small></span><span class="sw"><input type="checkbox" id="fVisible" checked><i></i></span></label>
+
+    <label class="fld"><span>Description</span><textarea id="fDesc" rows="3" maxlength="500" placeholder="Ex. Ordinateur portable HP 14 pouces, idéal pour le bureau et les études. Garanti 6 mois."></textarea></label>
+    <p class="hint" id="descHint"></p>
+
+    <div class="serp" aria-live="polite">
+      <span class="serp-lbl"><i class="fab fa-google"></i> Aperçu dans les résultats Google</span>
+      <cite id="serpUrl"></cite>
+      <b id="serpTitle"></b>
+      <p id="serpDesc"></p>
+    </div>
+
+    <div class="fld">
+      <span>Caractéristiques</span>
+      <div class="specs" id="specs"></div>
+      <button type="button" class="link" id="specAdd"><i class="fas fa-plus"></i> Ajouter une caractéristique</button>
+    </div>
+
+    <details class="fld more">
+      <summary>Avis clients (étoiles)</summary>
+      <div class="row2">
+        <label class="fld"><span>Note sur 5</span><input id="fNote" type="number" min="0" max="5" step="0.1"></label>
+        <label class="fld"><span>Nombre d'avis</span><input id="fAvis" type="number" min="0" step="1"></label>
+      </div>
+      <small class="muted">Laissez 0 avis pour ne pas afficher d'étoiles.</small>
+    </details>
+
+    <p class="err" id="edErr" hidden></p>
+  </form>
+  <div class="ed-foot">
+    <button class="btn btn-ghost danger" id="edDelete" type="button" aria-label="Supprimer"><i class="fas fa-trash"></i><span class="del-txt">Supprimer</span></button>
+    <span class="grow"></span>
+    <button class="btn btn-ghost" id="edCancel" type="button">Annuler</button>
+    <button class="btn btn-red" id="edSave" type="button"><i class="fas fa-check"></i> Enregistrer</button>
+  </div>
+</aside>
+
+<!-- ===================== ACTUALITÉS ===================== -->
+<aside class="editor" id="newsPanel" aria-label="Actualités" aria-hidden="true">
+  <div class="ed-head">
+    <h2 id="nTitle">Actualités</h2>
+    <button class="ib" id="newsClose" aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+  </div>
+  <div class="ed-body" id="newsList">
+    <button class="btn btn-red btn-block" id="newsAdd" type="button"><i class="fas fa-plus"></i> Nouvelle actualité</button>
+    <div class="news-items" id="newsItems"></div>
+  </div>
+  <form class="ed-body" id="newsForm" novalidate hidden>
+    <div class="photo" id="nPhotoBox"><img id="nImg" alt=""><div class="photo-empty"><i class="fas fa-image"></i><span>Ajouter une image</span></div><input type="file" id="nFile" accept="image/*" hidden></div>
+    <label class="fld"><span>Titre *</span><input id="nTitre" maxlength="110"></label>
+    <label class="fld"><span>Date</span><input id="nDate" type="date"></label>
+    <label class="fld"><span>Résumé (1 phrase)</span><textarea id="nResume" rows="2" maxlength="240"></textarea></label>
+    <label class="fld"><span>Texte</span><textarea id="nTexte" rows="9" maxlength="6000" placeholder="Laissez une ligne vide entre deux paragraphes."></textarea></label>
+    <label class="switch-line"><span><b>Visible sur le site</b><small>Décochez pour garder l'actualité en brouillon</small></span><span class="sw"><input type="checkbox" id="nVisible" checked><i></i></span></label>
+    <p class="err" id="nErr" hidden></p>
+  </form>
+  <div class="ed-foot">
+    <button class="btn btn-ghost danger" id="nDelete" type="button" hidden><i class="fas fa-trash"></i><span class="del-txt">Supprimer</span></button>
+    <span class="grow"></span>
+    <button class="btn btn-ghost" id="nCancel" type="button">Fermer</button>
+    <button class="btn btn-red" id="nSave" type="button" hidden><i class="fas fa-check"></i> Enregistrer</button>
+  </div>
+</aside>
+
+<!-- ===================== RÉFÉRENCEMENT GOOGLE ===================== -->
+<aside class="editor" id="seoPanel" aria-label="Référencement Google" aria-hidden="true">
+  <div class="ed-head">
+    <h2>Référencement Google</h2>
+    <button class="ib" id="seoClose" aria-label="Fermer"><i class="fas fa-xmark"></i></button>
+  </div>
+  <form class="ed-body" id="seoForm" novalidate>
+    <div class="seo-auto">
+      <i class="fas fa-rotate"></i>
+      <p>À chaque publication, ces éléments sont mis à jour tout seuls : <b>une page par article</b> (<span id="sPages">0</span> pages), le catalogue, le plan du site pour Google et les informations de la boutique.</p>
+    </div>
+
+    <label class="fld"><span>Adresse du site</span><input id="sAdresse" type="url" inputmode="url" spellcheck="false" autocomplete="off"></label>
+    <p class="hint" id="sAdresseHint"></p>
+
+    <div class="fld">
+      <span>Plan du site à déclarer dans Google Search Console</span>
+      <div class="copy-line"><code id="sSitemap"></code><button type="button" class="btn btn-ghost btn-sm" id="sCopy"><i class="fas fa-copy"></i> Copier</button></div>
+    </div>
+
+    <label class="fld"><span>Google Search Console : code de validation</span><input id="sGsc" spellcheck="false" autocomplete="off" placeholder="Collez la balise donnée par Google"></label>
+    <details class="help-mini">
+      <summary>Où trouver ce code ?</summary>
+      <ol>
+        <li>Ouvrez <b>search.google.com/search-console</b> avec le compte Google de la boutique.</li>
+        <li>Ajoutez une propriété, choisissez <b>Préfixe de l'URL</b> et collez l'adresse du site.</li>
+        <li>Choisissez la méthode <b>Balise HTML</b>, copiez la balise et collez-la ici.</li>
+        <li>Enregistrez, publiez, attendez une minute, puis cliquez <b>Valider</b> chez Google.</li>
+        <li>Dans <b>Sitemaps</b>, ajoutez l'adresse du plan du site ci-dessus.</li>
+      </ol>
+    </details>
+
+    <label class="fld"><span>Google Analytics : ID de mesure (facultatif)</span><input id="sGa" spellcheck="false" autocomplete="off" placeholder="G-XXXXXXXXXX"></label>
+    <details class="help-mini">
+      <summary>À quoi ça sert ?</summary>
+      <p>Pour voir le nombre de visiteurs, les pages les plus vues et d'où viennent vos clients. Créez un compte sur <b>analytics.google.com</b>, ajoutez un flux de données « Web » avec l'adresse du site, puis copiez l'<b>ID de mesure</b> (il commence par G-).</p>
+    </details>
+
+    <p class="err" id="seoErr" hidden></p>
+  </form>
+  <div class="ed-foot">
+    <span class="grow"></span>
+    <button class="btn btn-ghost" id="seoCancel" type="button">Annuler</button>
+    <button class="btn btn-red" id="seoSave" type="button"><i class="fas fa-check"></i> Enregistrer</button>
+  </div>
+</aside>
+
+<!-- ===================== BOÎTE DE CONFIRMATION ===================== -->
+<div class="dialog" id="dialog" role="dialog" aria-modal="true" hidden>
+  <div class="dlg-card">
+    <h3 id="dlgTitle"></h3>
+    <p id="dlgText"></p>
+    <div class="dlg-acts"><button class="btn btn-ghost" id="dlgNo">Annuler</button><button class="btn btn-red" id="dlgYes">Confirmer</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/seo-pages.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
